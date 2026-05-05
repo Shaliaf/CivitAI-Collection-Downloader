@@ -1,3 +1,7 @@
+# Arhiving
+
+[Gallery DL](https://codeberg.org/mikf/gallery-dl) is a more reliable solution currently. I would need to update the video dl code.
+
 # CivitAI Downloader
 
 A Python tool for downloading media (images and videos) and metadata from CivitAI collections and posts.
