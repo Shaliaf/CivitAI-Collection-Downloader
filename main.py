@@ -5,6 +5,7 @@ import time
 import yaml
 import argparse
 import logging
+import glob
 from pathlib import Path
 
 from config import init_config, config, setup_logging
@@ -39,26 +40,36 @@ def process_collection(api, collection_id, dry_run=False, skip_metadata=False, a
 
         logging.info(f"Found {len(media_items)} media items in collection: {collection_id}")
 
-        downloaded_items = []
+        # adding already downloaded items and removing json from list
+        downloaded_items = glob.glob(str(download_dir) + "\\*.*")
+        downloaded_items[:] = [a for a in downloaded_items if Path(a).suffix != ".json"]
+        downloaded_items_ids = [Path(a).stem for a in downloaded_items]
+
         items_metadata = []
+        logging.info(f"DEBUG downloaded_items: {downloaded_items}")
+        logging.info(f"DEBUG downloaded_items_ids: {downloaded_items_ids}")
 
         for i, item in enumerate(media_items):
+
             item_id = item.get("id")
             logging.info(f"Processing item {i+1}/{len(media_items)}: ID {item_id}")
 
-            item_details = api.get_image_details(item_id) or item
+            if str(item_id) in downloaded_items_ids:
+                logging.info(f"Item {item_id} is already in destination folder")
+            else:
+                item_details = api.get_image_details(item_id) or item
 
-            metadata = extract_metadata(api, item_details)
-            items_metadata.append(metadata)
+                metadata = extract_metadata(api, item_details)
+                items_metadata.append(metadata)
 
-            if not dry_run:
-                downloaded_file = download_media(item_details, download_dir, api_key)
-                if downloaded_file:
-                    downloaded_items.append(downloaded_file)
-                    if not skip_metadata:
-                        base_name = downloaded_file.stem
-                        meta_path = download_dir / f"{base_name}_metadata.json"
-                        save_metadata(metadata, meta_path)
+                if not dry_run:
+                    downloaded_file = download_media(item_details, download_dir, api_key)
+                    if downloaded_file:
+                        downloaded_items.append(downloaded_file)
+                        if not skip_metadata:
+                            base_name = downloaded_file.stem
+                            meta_path = download_dir / f"{base_name}_metadata.json"
+                            save_metadata(metadata, meta_path)
 
         if not skip_metadata and not dry_run and items_metadata:
             collection_data = api.get_collection_by_id(collection_id)

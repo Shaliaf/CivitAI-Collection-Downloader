@@ -170,7 +170,7 @@ def download_media(media_data, download_dir, api_key=None):
     base_name = sanitize_filename(media_name)
     base_name, _ = os.path.splitext(base_name)  # Remove any existing extension
     extension = get_file_extension(mime_type)
-    file_name = f"{base_name}{extension}"
+    file_name = f"{media_id}{extension}" # EDIT TO SET THE ID INSTEAD
 
     # Full path for the file
     file_path = Path(download_dir) / file_name
