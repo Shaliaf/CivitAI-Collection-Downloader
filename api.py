@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class CivitaiAPI:
     """Client for interacting with CivitAI's TRPC API."""
     
-    BASE_URL = "https://civitai.com/api/trpc"
+    BASE_URL = "https://civitai.red/api/trpc"
     
     def __init__(self, api_key=None):
         """Initialize the API client with the provided API key."""
