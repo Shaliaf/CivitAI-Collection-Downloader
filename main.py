@@ -31,7 +31,12 @@ def parse_arguments():
 def process_collection(api, collection_id, dry_run=False, skip_metadata=False, api_key=None):
     """Process a collection and download its media and metadata."""
     try:
-        download_dir = create_download_directory(collection_id)
+        # getting collection name to make it more understandable for directory naming
+        collection_data_forname = api.get_collection_by_id(collection_id)
+        collection_metadata_forname = collection_data_forname.get("collection", {})
+        collection_name = collection_metadata_forname.get("name", f"Collection-{collection_id}")
+
+        download_dir = create_download_directory(collection_id + " " + collection_name)
 
         media_items = api.get_all_images_in_collection(collection_id)
         if not media_items:
